@@ -1,10 +1,11 @@
-
 # openapi-mock-middleware
 
-## 介绍
- 后台定义好规范的openapi接口后，利用api文档简化前端mock数据。
+## Installation
 
-## 使用
+Generating mock data using open API file
+
+## Usage
+
 ```js
 const express = require('express');
 
