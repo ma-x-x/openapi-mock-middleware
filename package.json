@@ -1,6 +1,6 @@
 {
   "name": "openapi-mock-middleware",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "scripts": {
     "start": "yarn build -w",
     "build": "yarn build:ts",
@@ -60,5 +60,8 @@
     "ts-jest": "^27.0.7",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }
