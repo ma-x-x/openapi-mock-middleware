@@ -203,9 +203,21 @@ export class Operation {
   ): express.Response {
     const responseStatus = this.getResponseStatus();
     const responseSchema = this.getResponseSchema(responseStatus);
-    return res
-      .status(responseStatus)
-      .json(responseSchema ? this.generator.generate(responseSchema) : {});
+    return res.status(responseStatus).json(
+      responseSchema
+        ? {
+            code: '0000',
+            message: '处理成功',
+            timestamp: '2022-01-10 00:56:45',
+            data: this.generator.generate(responseSchema),
+          }
+        : {
+            code: '0000',
+            message: '处理成功',
+            timestamp: '2022-01-10 00:56:45',
+            data: {},
+          }
+    );
   }
 }
 
