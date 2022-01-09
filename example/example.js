@@ -17,7 +17,7 @@ app.use(
       spec: ['./example'], // apiSpec。支持file, dir,  array。
       ignore: [/\.js$/], // 扫描目录时忽略的文件 string, RegExp or array
       ext: ['.yml', '.json'], // API文件后缀格式：string or array
-      isValidate: true, // 是否开启校验: 开启之后将校验请求的 header、path、query、body。
+      isValidate: false, // 是否开启校验: 开启之后将校验请求的 header、path、query、body。
     },
     response: {
       locale: 'zh', // json-schema-faker locale, default to 'en'

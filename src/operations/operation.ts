@@ -87,14 +87,16 @@ export class Operation {
         'content',
         'application/json',
         'schema',
-      ])
+      ]) ||
+      has(this.operation, ['responses', '200', 'schema'])
     ) {
-      const { schema, example, examples } = get(this.operation, [
-        'responses',
-        responseStatus,
-        'content',
-        'application/json',
-      ]);
+      const { schema, example, examples } =
+        get(this.operation, [
+          'responses',
+          responseStatus,
+          'content',
+          'application/json',
+        ]) || get(this.operation, ['responses', '200']);
 
       if (schema && !isReferenceObject(schema)) {
         const resultSchema: JSONSchema = schema as JSONSchema;
@@ -201,7 +203,6 @@ export class Operation {
   ): express.Response {
     const responseStatus = this.getResponseStatus();
     const responseSchema = this.getResponseSchema(responseStatus);
-
     return res
       .status(responseStatus)
       .json(responseSchema ? this.generator.generate(responseSchema) : {});
