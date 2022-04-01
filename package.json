@@ -1,6 +1,6 @@
 {
   "name": "openapi-mock-middleware",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "scripts": {
     "start": "nodemon dist/test.js",
     "debug": "nodemon --inspect dist/test.js",
