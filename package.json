@@ -1,6 +1,6 @@
 {
   "name": "openapi-mock-middleware",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
