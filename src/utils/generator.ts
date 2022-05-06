@@ -1,5 +1,5 @@
 import jsf, { JSF, JSFOptions } from 'json-schema-faker';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import type { OpenAPIV3 } from 'openapi-types';
 
 export { JSONSchema, JSFOptions, JSF } from 'json-schema-faker';
@@ -34,7 +34,7 @@ export const handleExamples = (value: any): any => {
 };
 
 export const createGenerator: (response?: responseType) => JSF = (response) => {
-  const locale = response?.locale || 'zh';
+  const locale = response?.locale || 'zh_CN';
   const options = response?.options || defaultOptions;
   const callback = response?.callback || <JSFCallback>(() => {});
   jsf.option({
@@ -43,11 +43,9 @@ export const createGenerator: (response?: responseType) => JSF = (response) => {
   });
 
   jsf.extend('faker', () => {
-    faker.locale = locale;
+    const faker = require('@faker-js/faker/locale/zh_CN');
     return faker;
   });
-
-  callback(jsf, faker);
 
   jsf.define('example', (value) => {
     return value;
