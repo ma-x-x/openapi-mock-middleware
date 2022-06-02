@@ -7,237 +7,196 @@ import { pathToRegexp } from 'path-to-regexp';
 import { JSF, JSONSchema } from '../utils';
 
 export interface ParamsSchemas {
-  header: JSONSchema;
-  query: JSONSchema;
-  path: JSONSchema;
+	header: JSONSchema;
+	query: JSONSchema;
+	path: JSONSchema;
 }
 
-function isReferenceObject(
-  response: unknown
-): response is OpenAPIV3.ReferenceObject {
-  return (
-    typeof response === 'object' && response !== null && '$ref' in response
-  );
+function isReferenceObject(response: unknown): response is OpenAPIV3.ReferenceObject {
+	return typeof response === 'object' && response !== null && '$ref' in response;
 }
 
 export class Operation {
-  method: string;
+	method: string;
 
-  pathRegexp: RegExp;
+	pathRegexp: RegExp;
 
-  operation: OpenAPIV3.OperationObject;
+	operation: OpenAPIV3.OperationObject;
 
-  pathPattern: string;
+	pathPattern: string;
 
-  generator: JSF;
+	generator: JSF;
 
-  securitySchemes: { [key: string]: OpenAPIV3.SecuritySchemeObject } | null;
+	securitySchemes: { [key: string]: OpenAPIV3.SecuritySchemeObject } | null;
 
-  constructor({
-    method,
-    path,
-    operation,
-    securitySchemes,
-    generator,
-  }: {
-    path: string;
-    method: string;
-    operation: OpenAPIV3.OperationObject;
-    generator: JSF;
-    securitySchemes?: { [key: string]: OpenAPIV3.SecuritySchemeObject };
-  }) {
-    this.pathPattern = path.replace(
-      /\{([^/}]+)\}/g,
-      (p1: string, p2: string): string => `:${p2}`
-    );
+	constructor({
+		method,
+		path,
+		operation,
+		securitySchemes,
+		generator
+	}: {
+		path: string;
+		method: string;
+		operation: OpenAPIV3.OperationObject;
+		generator: JSF;
+		securitySchemes?: { [key: string]: OpenAPIV3.SecuritySchemeObject };
+	}) {
+		this.pathPattern = path.replace(/\{([^/}]+)\}/g, (p1: string, p2: string): string => `:${p2}`);
 
-    this.method = method.toUpperCase();
-    this.operation = operation;
-    this.securitySchemes = securitySchemes || null;
-    this.generator = generator;
+		this.method = method.toUpperCase();
+		this.operation = operation;
+		this.securitySchemes = securitySchemes || null;
+		this.generator = generator;
 
-    this.pathRegexp = pathToRegexp(this.pathPattern);
-  }
+		this.pathRegexp = pathToRegexp(this.pathPattern);
+	}
 
-  getResponseStatus(): number {
-    const responses = get(this.operation, 'responses');
+	getResponseStatus(): number {
+		const responses = get(this.operation, 'responses');
 
-    if (!responses) {
-      return 200;
-    }
+		if (!responses) {
+			return 200;
+		}
 
-    const status: string | undefined = findKey(responses, (content, code) => {
-      const statusCode = parseInt(code, 10);
+		const status: string | undefined = findKey(responses, (content, code) => {
+			const statusCode = parseInt(code, 10);
 
-      if (Number.isNaN(statusCode)) {
-        return false;
-      }
+			if (Number.isNaN(statusCode)) {
+				return false;
+			}
 
-      return statusCode >= 200 && statusCode < 299;
-    });
+			return statusCode >= 200 && statusCode < 299;
+		});
 
-    return status ? parseInt(status, 10) : 200;
-  }
+		return status ? parseInt(status, 10) : 200;
+	}
 
-  getResponseSchema(responseStatus = 200): JSONSchema | null {
-    if (
-      has(this.operation, [
-        'responses',
-        responseStatus,
-        'content',
-        'application/json',
-        'schema',
-      ]) ||
-      has(this.operation, ['responses', '200', 'schema'])
-    ) {
-      const { schema, example, examples } =
-        get(this.operation, [
-          'responses',
-          responseStatus,
-          'content',
-          'application/json',
-        ]) || get(this.operation, ['responses', '200']);
+	getResponseSchema(responseStatus = 200): JSONSchema | null {
+		if (
+			has(this.operation, [ 'responses', responseStatus, 'content', 'application/json', 'schema' ]) ||
+			has(this.operation, [ 'responses', '200', 'schema' ])
+		) {
+			const { schema, example, examples } =
+				get(this.operation, [ 'responses', responseStatus, 'content', 'application/json' ]) ||
+				get(this.operation, [ 'responses', '200' ]);
 
-      if (schema && !isReferenceObject(schema)) {
-        const resultSchema: JSONSchema = schema as JSONSchema;
+			if (schema && !isReferenceObject(schema)) {
+				const resultSchema: JSONSchema = schema as JSONSchema;
 
-        if (example) {
-          resultSchema.example = example;
-        }
+				if (example) {
+					resultSchema.example = example;
+				}
 
-        if (examples) {
-          resultSchema.examples = examples;
-        }
+				if (examples) {
+					resultSchema.examples = examples;
+				}
 
-        return resultSchema;
-      }
+				return resultSchema;
+			}
 
-      return null;
-    }
+			return null;
+		}
 
-    return null;
-  }
+		return null;
+	}
 
-  getSecurityRequirements(): OpenAPIV3.SecurityRequirementObject[] {
-    const requirements: OpenAPIV3.SecurityRequirementObject[] =
-      this.operation.security || [];
+	getSecurityRequirements(): OpenAPIV3.SecurityRequirementObject[] {
+		const requirements: OpenAPIV3.SecurityRequirementObject[] = this.operation.security || [];
 
-    return requirements;
-  }
+		return requirements;
+	}
 
-  getParamsSchemas(): ParamsSchemas {
-    const schemas: ParamsSchemas = {
-      header: {
-        type: 'object',
-        required: [],
-      },
-      query: {
-        type: 'object',
-        additionalProperties: false,
-        required: [],
-      },
-      path: {
-        type: 'object',
-        additionalProperties: false,
-        required: [],
-      },
-    };
+	getParamsSchemas(): ParamsSchemas {
+		const schemas: ParamsSchemas = {
+			header: {
+				type: 'object',
+				required: []
+			},
+			query: {
+				type: 'object',
+				additionalProperties: false,
+				required: []
+			},
+			path: {
+				type: 'object',
+				additionalProperties: false,
+				required: []
+			}
+		};
 
-    const parameters = get(this.operation, ['parameters']);
+		const parameters = get(this.operation, [ 'parameters' ]);
 
-    if (parameters) {
-      parameters.forEach((parameter) => {
-        if (
-          parameter &&
-          !isReferenceObject(parameter) &&
-          (parameter.in === 'header' ||
-            parameter.in === 'query' ||
-            parameter.in === 'path') &&
-          schemas[parameter.in]
-        ) {
-          const prevRequired: string[] = schemas[parameter.in].required || [];
+		if (parameters) {
+			parameters.forEach((parameter) => {
+				if (
+					parameter &&
+					!isReferenceObject(parameter) &&
+					(parameter.in === 'header' || parameter.in === 'query' || parameter.in === 'path') &&
+					schemas[parameter.in]
+				) {
+					const prevRequired: string[] = schemas[parameter.in].required || [];
 
-          set(
-            schemas,
-            [
-              parameter.in,
-              'properties',
-              parameter.in === 'header'
-                ? parameter.name.toLowerCase()
-                : parameter.name,
-            ],
-            parameter.schema
-          );
+					set(
+						schemas,
+						[
+							parameter.in,
+							'properties',
+							parameter.in === 'header' ? parameter.name.toLowerCase() : parameter.name
+						],
+						parameter.schema
+					);
 
-          if (parameter.required) {
-            set(
-              schemas,
-              [parameter.in, 'required'],
-              [
-                ...prevRequired,
-                parameter.in === 'header'
-                  ? parameter.name.toLowerCase()
-                  : parameter.name,
-              ]
-            );
-          }
-        }
-      });
-    }
+					if (parameter.required) {
+						set(
+							schemas,
+							[ parameter.in, 'required' ],
+							[
+								...prevRequired,
+								parameter.in === 'header' ? parameter.name.toLowerCase() : parameter.name
+							]
+						);
+					}
+				}
+			});
+		}
 
-    return schemas;
-  }
+		return schemas;
+	}
 
-  getBodySchema(contentType: string): JSONSchema | null {
-    return get(this.operation, [
-      'requestBody',
-      'content',
-      contentType,
-      'schema',
-    ]);
-  }
+	getBodySchema(contentType: string): JSONSchema | null {
+		return get(this.operation, [ 'requestBody', 'content', contentType, 'schema' ]);
+	}
 
-  generateResponse(
-    req: express.Request,
-    res: express.Response
-  ): express.Response {
-    const responseStatus = this.getResponseStatus();
-    const responseSchema = this.getResponseSchema(responseStatus);
-    return res.status(responseStatus).json(
-      responseSchema
-        ? {
-            code: '0000',
-            message: '处理成功',
-            timestamp: '2022-01-10 00:56:45',
-            data: this.generator.generate(responseSchema),
-          }
-        : {
-            code: '0000',
-            message: '处理成功',
-            timestamp: '2022-01-10 00:56:45',
-            data: {},
-          }
-    );
-  }
+	generateResponse(
+		req: express.Request,
+		res: express.Response,
+		withResponse?: <T>(data: T) => any
+	): express.Response {
+		const responseStatus = this.getResponseStatus();
+		const responseSchema = this.getResponseSchema(responseStatus);
+		const responseData = responseSchema ? this.generator.generate(responseSchema) : {};
+		return res.status(responseStatus).json(withResponse ? withResponse(responseData) : responseData);
+	}
 }
 
 export const createOperation = ({
-  method,
-  path,
-  operation,
-  generator,
-  securitySchemes,
+	method,
+	path,
+	operation,
+	generator,
+	securitySchemes
 }: {
-  path: string;
-  method: string;
-  operation: OpenAPIV3.OperationObject;
-  generator: JSF;
-  securitySchemes?: { [key: string]: OpenAPIV3.SecuritySchemeObject };
+	path: string;
+	method: string;
+	operation: OpenAPIV3.OperationObject;
+	generator: JSF;
+	securitySchemes?: { [key: string]: OpenAPIV3.SecuritySchemeObject };
 }): Operation =>
-  new Operation({
-    method,
-    path,
-    operation,
-    generator,
-    securitySchemes,
-  });
+	new Operation({
+		method,
+		path,
+		operation,
+		generator,
+		securitySchemes
+	});

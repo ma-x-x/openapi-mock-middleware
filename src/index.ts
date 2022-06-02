@@ -22,10 +22,7 @@ export interface MiddlewareOptions {
 
 /** */
 
-export const createMockMiddleware = ({
-  request,
-  response,
-}: MiddlewareOptions): express.Router => {
+export const createMockMiddleware = ({request,response}: MiddlewareOptions): express.Router => {
   if (typeof request.spec === 'string' && !fs.existsSync(request.spec)) {
     throw new Error(`api spec file not exit: ${request.spec}`);
   } else if (request.spec === undefined) {
@@ -54,7 +51,7 @@ export const createMockMiddleware = ({
 
   router.use((req, res, next) => {
     return res.locals.operation
-      ? res.locals.operation.generateResponse(req, res)
+      ? res.locals.operation.generateResponse(req, res, response?.withResponse)
       : next();
   });
 

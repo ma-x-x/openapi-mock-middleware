@@ -36,6 +36,7 @@ app.use(
         // function where you can extend json-schema-faker
         // ...
       },
+      withResponse: (data) => ({code:'9999',message:'测试一下',data}), // 可以对返回的数据进行处理
     },
   })
 );
