@@ -27,6 +27,6 @@ export declare const createOperations: ({ request, response, }: {
         locale: string;
         options: Partial<JSFOptions>;
         callback: JSFCallback;
-        withResponse: <T>(data: T) => any;
+        withResponse?: (<T>(data: T) => any) | undefined;
     }> | undefined;
 }) => Operations;

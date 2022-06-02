@@ -15,7 +15,7 @@ export type responseType = Partial<{
   locale: string;
   options: Partial<JSFOptions>;
   callback: JSFCallback;
-  withResponse: <T>(data: T) => any;
+  withResponse?: <T>(data: T) => any;
 }>;
 
 const defaultOptions = {

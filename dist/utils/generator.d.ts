@@ -13,7 +13,7 @@ export declare type responseType = Partial<{
     locale: string;
     options: Partial<JSFOptions>;
     callback: JSFCallback;
-    withResponse: <T>(data: T) => any;
+    withResponse?: <T>(data: T) => any;
 }>;
 export declare const handleExamples: (value: any) => any;
 export declare const createGenerator: (response?: responseType) => JSF;
