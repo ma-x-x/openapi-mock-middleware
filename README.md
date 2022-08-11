@@ -10,7 +10,7 @@ npm i openapi-mock-middleware
 
 ```js
 const express = require('express');
-const createMockMiddleware = require('openapi-mock-middleware');
+const { createMockMiddleware } = require('openapi-mock-middleware');
 
 const app = express();
 
