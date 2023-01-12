@@ -54,6 +54,7 @@
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
+    "better-opn": "^3.0.2",
     "commitizen": "^4.2.4",
     "concurrently": "^6.4.0",
     "cz-conventional-changelog": "^3.3.0",

@@ -3,6 +3,7 @@ const { createMockMiddleware } = require('../dist/index');
 const path = require('path');
 const fs = require('fs');
 const { getSync } = require('./utils');
+const opn = require('better-opn');
 // import express from 'express';
 // import { createMockMiddleware } from './dist/index';
 
@@ -36,11 +37,12 @@ app.use(
         // function where you can extend json-schema-faker
         // ...
       },
-      withResponse: (data) => ({code:'9999',message:'测试一下',data}), // 可以对返回的数据进行处理
+      withResponse: (data) => ({ code: '9999', message: '测试一下', data }), // 可以对返回的数据进行处理
     },
   })
 );
 
-app.listen(8090, () =>
-  console.log('Server listening on http://localhost:8090')
-);
+app.listen(8090, () => {
+  opn('http://localhost:8090/api/pet/findByStatus');
+  console.log('Server listening on http://localhost:8090');
+});
